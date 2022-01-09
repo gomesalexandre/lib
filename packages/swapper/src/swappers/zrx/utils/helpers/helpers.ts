@@ -11,7 +11,7 @@ import {
 import { AxiosResponse } from 'axios'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
-import type { AbiItem } from 'web3-utils'
+import { AbiItem } from 'web3-utils'
 
 import { SwapError } from '../../../../api'
 import { ZrxError } from '../../ZrxSwapper'
