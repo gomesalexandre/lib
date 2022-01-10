@@ -193,7 +193,9 @@ export class EthereumChainAdapter implements ChainAdapter {
 
   async validateAddress(address: string): Promise<ValidAddressResult> {
     const isValidAddress = WAValidator.validate(address, this.getType())
-    if (isValidAddress) return { valid: true, result: ValidAddressResultType.Valid }
+    const isValidEnsAddress = new RegExp(/([A-Za-z]*\.)?([A-Za-z]{3,})\.eth/).test(address)
+    if (isValidAddress || isValidEnsAddress)
+      return { valid: true, result: ValidAddressResultType.Valid }
     return { valid: false, result: ValidAddressResultType.Invalid }
   }
 }
