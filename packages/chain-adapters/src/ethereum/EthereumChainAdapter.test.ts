@@ -9,6 +9,7 @@ import { NativeAdapterArgs, NativeHDWallet } from '@shapeshiftoss/hdwallet-nativ
 import { chainAdapters, ChainTypes } from '@shapeshiftoss/types'
 import { numberToHex } from 'web3-utils'
 
+import { bn } from '../utils/bignumber'
 import * as ethereum from './EthereumChainAdapter'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -306,12 +307,16 @@ describe('EthereumChainAdapter', () => {
       })
       expect(args.providers.http.getAccount).toHaveBeenCalledTimes(1)
     })
-    it('should send max balance with sendMax property in tx', async () => {
+    it('without chainSpecific.erc20ContractAddress should build a tx with full account balance - gas fee', async () => {
+      const balance = '2500000'
+      const expectedValue = numberToHex(
+        bn(balance).minus(bn(gasLimit).multipliedBy(gasPrice)) as any
+      )
       args.providers.http = {
         getInfo: jest.fn().mockResolvedValue(getInfoMockResponse),
         getAccount: jest.fn<any, any>().mockResolvedValue({
           data: {
-            balance: '2500000',
+            balance,
             unconfirmedBalance: '0',
             nonce: 2,
             tokens: [
@@ -344,7 +349,7 @@ describe('EthereumChainAdapter', () => {
           gasPrice: numberToHex(gasPrice),
           nonce: '0x2',
           to: EOA_ADDRESS,
-          value: '0xb3b00'
+          value: expectedValue
         }
       })
       expect(args.providers.http.getAccount).toHaveBeenCalledTimes(2)
@@ -392,7 +397,7 @@ describe('EthereumChainAdapter', () => {
       })
       expect(args.providers.http.getAccount).toHaveBeenCalledTimes(1)
     })
-    it('should build a tx with full account balance - gas fee for ERC20 txs with sendMax', async () => {
+    it('with chainSpecific.erc20ContractAddress should build a tx with full account balance - gas fee', async () => {
       args.providers.http = {
         getInfo: jest.fn().mockResolvedValue(getInfoMockResponse),
         getAccount: jest.fn<any, any>().mockResolvedValue({
@@ -416,7 +421,7 @@ describe('EthereumChainAdapter', () => {
 
       const tx = ({
         wallet: await getWallet(),
-        to: ZERO_ADDRESS,
+        to: '0x05a1ff0a32bc24265bcb39499d0c5d9a6cb2011c',
         value,
         chainSpecific: chainSpecificWithErc20ContractAddress,
         sendMax: true
@@ -427,7 +432,7 @@ describe('EthereumChainAdapter', () => {
           addressNList: [2147483692, 2147483708, 2147483648, 0, 0],
           chainId: 1,
           data:
-            '0xa9059cbb00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000067932',
+            '0xa9059cbb00000000000000000000000005a1ff0a32bc24265bcb39499d0c5d9a6cb2011c0000000000000000000000000000000000000000000000000000000000067932',
           gasLimit: numberToHex(gasLimit),
           gasPrice: numberToHex(gasPrice),
           nonce: '0x2',
