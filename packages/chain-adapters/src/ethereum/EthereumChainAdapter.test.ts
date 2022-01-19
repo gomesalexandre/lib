@@ -4,7 +4,9 @@
  * Test EthereumChainAdapter
  * @group unit
  */
-import { chainAdapters } from '@shapeshiftoss/types'
+import { HDWallet } from '@shapeshiftoss/hdwallet-core'
+import { NativeAdapterArgs, NativeHDWallet } from '@shapeshiftoss/hdwallet-native'
+import { chainAdapters, ChainTypes } from '@shapeshiftoss/types'
 
 import * as ethereum from './EthereumChainAdapter'
 
@@ -17,6 +19,19 @@ const getGasFeesMockedResponse = {
 }
 
 const estimateGasMockedResponse = { data: '21000' }
+
+const testMnemonic = 'alcohol woman abuse must during monitor noble actual mixed trade anger aisle'
+
+const getWallet = async (): Promise<HDWallet> => {
+  const nativeAdapterArgs: NativeAdapterArgs = {
+    mnemonic: testMnemonic,
+    deviceId: 'test'
+  }
+  const wallet = new NativeHDWallet(nativeAdapterArgs)
+  await wallet.initialize()
+
+  return wallet
+}
 
 jest.mock('axios', () => ({
   get: jest.fn(() =>
@@ -183,6 +198,41 @@ describe('EthereumChainAdapter', () => {
         const res = await adapter.validateEnsAddress(referenceAddress)
         expect(res).toMatchObject(expectedReturnValue)
       })
+    })
+  })
+
+  describe('broadcastTransaction', () => {
+    it('should correctly call broadcastTransaction', async () => {
+      const sendDataResult = 'success'
+      args.providers.http = {
+        sendTx: jest.fn().mockResolvedValue({ data: sendDataResult })
+      } as any
+      const adapter = new ethereum.ChainAdapter(args)
+      const mockTx = '0x123'
+      const result = await adapter.broadcastTransaction(mockTx)
+      expect(args.providers.http.sendTx).toHaveBeenCalledWith<any>({ sendTxBody: { hex: mockTx } })
+      expect(result).toEqual(sendDataResult)
+    })
+  })
+
+  describe('buildSendTransaction', () => {
+    // WIP
+    it('should throw if passed tx has no to address', async () => {
+      const wallet: HDWallet = await getWallet()
+      const chainSpecific = {
+        gasPrice: '42',
+        gasLimit: '42000'
+      }
+
+      const adapter = new ethereum.ChainAdapter(args)
+      const value = '400'
+
+      const tx = ({ wallet, value, chainSpecific } as unknown) as chainAdapters.BuildSendTxInput<
+        ChainTypes.Ethereum
+      >
+      await expect(adapter.buildSendTransaction(tx)).rejects.toThrow(
+        'EthereumChainAdapter: to is required'
+      )
     })
   })
 })
