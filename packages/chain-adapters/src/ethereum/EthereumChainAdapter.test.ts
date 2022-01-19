@@ -7,6 +7,7 @@
 import { HDWallet } from '@shapeshiftoss/hdwallet-core'
 import { NativeAdapterArgs, NativeHDWallet } from '@shapeshiftoss/hdwallet-native'
 import { chainAdapters, ChainTypes } from '@shapeshiftoss/types'
+import { numberToHex } from 'web3-utils'
 
 import * as ethereum from './EthereumChainAdapter'
 
@@ -296,11 +297,11 @@ describe('EthereumChainAdapter', () => {
           addressNList: [2147483692, 2147483708, 2147483648, 0, 0],
           chainId: 1,
           data: '',
-          gasLimit: '0xa410',
-          gasPrice: '0x2a',
+          gasLimit: numberToHex(gasLimit),
+          gasPrice: numberToHex(gasPrice),
           nonce: '0x2',
           to: EOA_ADDRESS,
-          value: '0x190'
+          value: numberToHex(value)
         }
       })
       expect(args.providers.http.getAccount).toHaveBeenCalledTimes(1)
@@ -339,8 +340,8 @@ describe('EthereumChainAdapter', () => {
           addressNList: [2147483692, 2147483708, 2147483648, 0, 0],
           chainId: 1,
           data: '',
-          gasLimit: '0xa410',
-          gasPrice: '0x2a',
+          gasLimit: numberToHex(gasLimit),
+          gasPrice: numberToHex(gasPrice),
           nonce: '0x2',
           to: EOA_ADDRESS,
           value: '0xb3b00'
@@ -382,8 +383,8 @@ describe('EthereumChainAdapter', () => {
           chainId: 1,
           data:
             '0xa9059cbb00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000190',
-          gasLimit: '0xa410',
-          gasPrice: '0x2a',
+          gasLimit: numberToHex(gasLimit),
+          gasPrice: numberToHex(gasPrice),
           nonce: '0x2',
           to: '0xc770eefad204b5180df6a14ee197d99d808ee52d',
           value: '0x0'
@@ -427,8 +428,8 @@ describe('EthereumChainAdapter', () => {
           chainId: 1,
           data:
             '0xa9059cbb00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000067932',
-          gasLimit: '0xa410',
-          gasPrice: '0x2a',
+          gasLimit: numberToHex(gasLimit),
+          gasPrice: numberToHex(gasPrice),
           nonce: '0x2',
           to: '0xc770eefad204b5180df6a14ee197d99d808ee52d',
           value: '0x0'
